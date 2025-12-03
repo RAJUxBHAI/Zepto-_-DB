@@ -8,7 +8,7 @@
 
 ## **Project Overview**
 
-QComm Enterprise is a high-fidelity relational database system designed to model an **end-to-end quick commerce platform**—similar to Zepto, Blinkit, Swiggy Instamart, etc.
+QComm Enterprise is a high-fidelity relational database system designed to model an **end-to-end quick commerce platform — similar to Zepto, Blinkit, Swiggy Instamart, etc.
 The schema implements real-world complexities of instant-delivery ecosystems, incorporating:
 
 * Multi-city user onboarding
