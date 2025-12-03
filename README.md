@@ -1,112 +1,202 @@
-## DBMS-Project-(341066-341090-341077)
-## DBMS Project as part of Term - 2 for ETB Subject
-# Zepto-_-DB
-# Quick Commerce Database System (DBMS Project)
----
+# **DBMS-Project-(341066-341090-341077)**
 
-## Project Overview
+## **DBMS Project as part of Term – 2 for ETB Subject**
 
-This system represents a practical implementation of core DBMS principles—normalization, relational integrity, foreign key constraints, and modular schema design.
-
-The database mirrors how real-world instant-delivery platforms (e.g., Zepto, Blinkit, Dunzo) function behind the scenes:
-
-* Customers browse items and place orders
-* The system determines availability based on warehouse inventory
-* A delivery rider is assigned to fulfill the order
-* Orders move through lifecycle stages until completion
-* Items are billed individually with stored purchase-time prices
-* Warehouses maintain stock levels across multiple categories
-
-This backend design ensures fast lookups, consistent data integrity, and scalability for high-volume operations.
+# **QComm Enterprise DB (Quick Commerce Database System)**
 
 ---
 
-## Database Schema
+## **Project Overview**
 
-The schema is divided into **four functional modules**, covering **7 interdependent tables**. Each module reflects a responsibility within the quick-commerce ecosystem.
+QComm Enterprise is a high-fidelity relational database system designed to model an **end-to-end quick commerce platform**—similar to Zepto, Blinkit, Swiggy Instamart, etc.
+The schema implements real-world complexities of instant-delivery ecosystems, incorporating:
 
----
+* Multi-city user onboarding
+* Detailed address management with geolocation
+* Categorized product catalogs with brands, taxes & variants
+* Warehouse-based inventory with batch-level tracking
+* Rider assignment, shifts & live logistics
+* Coupon engine & advanced order computation
+* User wallets, transactions, and financial flows
+* Customer support, complaints & product reviews
 
-### 1. **Customer & Rider Operations**
-
-This module manages the two primary human-facing components: the customers who place orders and the riders who deliver them.
-
-* **Customers:**
-  Stores user identity, contact information, saved addresses, and account creation timestamp. Ensures each customer is uniquely identifiable via phone numbers, mirroring real-world login methods.
-
-* **Delivery_Riders:**
-  Maintains rider identity, contact numbers, and live availability status (*Available*, *Busy*, *Offline*).
-  This enables real-time dispatching logic where orders can be assigned only to available riders.
-
-Together, these tables power user interactions and order delivery assignment.
+This project demonstrates a large-scale, modular DBMS design applying concepts such as **normalization, foreign key enforcement, data integrity, scalability**, and **realistic enterprise schema structuring**.
 
 ---
 
-### 2. **Products & Storage**
+## **Database Design Philosophy**
 
-This module defines what the platform sells and where the products are stored.
+The goal behind this schema is to simulate the *thinking style* and architecture used by actual commerce companies:
+
+* **Modular, scalable tables** grouped by business domains
+* **Batch-level inventory** to track expiry, manufacturing & aisle positions
+* **Variant-based product catalog** reflecting real SKU-based operations
+* **Location-aware fulfillment operations** (cities → warehouses → riders)
+* **Flexible order lifecycle** to reflect modern delivery pipelines
+* **Transactional finance tables** for wallet operations & refunds
+* **Support system integration** for post-order complaint resolution
+
+This makes the project ideal not only academically but also as a blueprint for real microservice-based deployments.
+
+---
+
+## **Database Schema**
+
+The schema is divided into **six enterprise modules**, covering over **30 interconnected tables**.
+Each module represents a real business domain within a quick-commerce operation.
+
+---
+
+### **1. Users & Geography**
+
+This module forms the foundation of the system—mapping **cities**, **users**, their **addresses**, and **wallets**.
+
+* **Cities:**
+  Core geographical units containing city & state metadata, used by warehouses and user addresses.
+
+* **Users:**
+  Customer profiles including contact information, prime membership, and auto-generated timestamps.
+
+* **User Addresses:**
+  Each user can store multiple addresses tied to specific cities, including geolocation coordinates.
+
+* **User Wallets:**
+  Built-in wallet system for cashback, refunds, and digital transactions.
+
+This module ensures accurate customer onboarding, location-based delivery, and financial identity management.
+
+
+---
+
+### **2. Catalog & Products**
+
+The marketplace-facing module that organizes the entire product ecosystem.
+
+* **Categories:**
+  Nested structure for browsing (e.g., Essentials, Snacks, Pharma).
+
+* **Brands:**
+  Brand catalog with optional logo URLs.
+
+* **Taxes:**
+  GST slabs and sin-tax configurations applied to products.
 
 * **Products:**
-  A catalog of all items available for purchase, including names, pricing, categories, and image references.
-  Designed to scale with thousands of product listings.
+  Core items with category, brand, descriptions & tax mappings.
+
+* **Product Variants:**
+  SKU-level details such as weight/volume, MRP, selling price, and purchase limits.
+
+This module models a modern, scalable catalog capable of supporting thousands of searchable SKUs.
+
+
+
+---
+
+### **3. Warehousing & Inventory Management**
+
+A sophisticated module that ensures product availability across cities.
 
 * **Warehouses:**
-  Represents geographically distributed fulfillment hubs from which orders are shipped.
-  Each warehouse is assigned a physical location (pincode), enabling hyperlocal delivery routing.
+  Fulfillment centers mapped to cities with geo-coordinates and delivery radii.
 
-This forms the foundation of the platform's inventory and product discovery capabilities.
+* **Suppliers:**
+  Vendors from whom the warehouse procures goods.
+
+* **Purchase Orders:**
+  Tracks procurement operations: Created → Approved → Received.
+
+* **Inventory Batches:**
+  This is where realism kicks in—batch-level stock, expiry dates, aisle & rack-level storage.
+
+This module allows:
+✔ Expiry management
+✔ FIFO stock deduction
+✔ Warehouse-specific stock levels
+✔ Large-scale procurement operations
+
+(Industry-inspired inventory design.)
+
+
 
 ---
 
-### 3. **Inventory & Stock Management**
+### **4. Logistics & Rider Workforce**
 
-A crucial module that links products to warehouses.
+The operational backbone ensuring last-mile delivery.
 
-* **Inventory:**
-  Tracks stock availability of each product at every warehouse.
-  This many-to-many relationship allows:
+* **Delivery Partners (Riders):**
+  Rider profiles, vehicles, licenses, and assigned warehouses.
 
-  * the same product to exist in multiple warehouses
-  * each warehouse to stock a wide range of products
-  * real-time inventory deduction and refill mechanisms
+* **Shifts:**
+  Time-based slots for rush hours, evening peaks, or midnight deliveries.
 
-This structure ensures orders are only placed from warehouses with adequate stock and enables dynamic routing based on proximity and availability.
+* **Rider Shifts:**
+  Daily attendance, login/logout tracking, and rider productivity.
+
+This mimics how quick-commerce systems plan rider availability during peak demand hours.
+
+
 
 ---
 
-### 4. **Ordering & Transaction Flow**
+### **5. Orders & Order Lifecycle**
 
-This module manages the entire lifecycle of a customer order.
+A deeply structured ordering pipeline with applied discounts, fees, and SKU-level linkages.
+
+* **Coupons:**
+  Full coupon engine with percentage/flat discounting, min/max limits & expiry.
 
 * **Orders:**
-  Records customer identity, assigned rider, timestamps, total pricing, and order status (*Placed*, *Packing*, *Out for Delivery*, *Delivered*, *Cancelled*).
-  Acts as the central transaction anchor connecting customers, riders, and order items.
+  Captures user, warehouse, rider, time window, all fees, and delivery status transitions.
 
-* **Order_Items:**
-  Represents itemized entries within each order, capturing product ID, quantity, and price at the moment of purchase.
-  This ensures that historical billing remains accurate even if product prices change later.
+* **Order Items:**
+  Every item ties a *variant* to a *batch*, storing the exact price at the time of purchase.
 
-Together, they simulate real-world e-commerce checkout, itemization, and order delivery workflows.
+This module mirrors modern commerce apps—dynamic billing, discounts, and batch-sourced fulfillment.
 
----
 
-## Summary
-
-The seven interconnected tables collectively simulate the full backend logic of a modern quick-commerce platform. The system ensures:
-
-* Reliable customer management
-* Accurate, multi-location product stock control
-* Real-time coordination between warehouses and riders
-* Consistent tracking of order states and financial records
-* Infrastructure suitable for scaling to thousands of orders and products
-
-This schema serves as a strong foundation for academic DBMS projects or as a starting point for a real-world microservice-oriented delivery platform.
 
 ---
 
-## Group 15 – Member Details
+### **6. Finance & Support**
+
+Handles payments, refunds, user escalation, and feedback.
+
+* **Wallet Transactions:**
+  Every credit/debit entry tied to an order or wallet action.
+
+* **Support Tickets:**
+  Problem categories & resolution statuses—mirroring customer support desks.
+
+* **Product Reviews:**
+  User feedback on ratings and comments with timestamps.
+
+These tables close the loop between order completion and post-purchase customer engagement.
+
+
+
+---
+
+## **Summary**
+
+The QComm Enterprise Database provides:
+
+* Enterprise-level modular schema
+* Highly realistic modeling of real quick-commerce systems
+* Strong transactional integrity
+* Inventory + logistics + finance + support integration
+* Scalable structure suitable for academic + industry demonstrations
+
+This schema is ideal for demonstrating advanced DBMS concepts such as **normalization, indexing, referential integrity, role-based modularization, and real-time order workflows**.
+
+---
+
+## **Group 15 — Member Details**
+
 * **341066 – Ramanjan Dutta**
 * **341090 – Nandini Singh**
 * **341077 – Mohammed Sarshad**
 
 ---
+
